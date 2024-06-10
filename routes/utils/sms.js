@@ -1,6 +1,7 @@
-const accountSid = process.env.accountSid;
-const authToken = 'process.env.authToken ';
-const client = require('twilio')(accountSid, authToken);
+// const accountSid = process.env.ACCOUNTSID;
+// const authToken = process.env.AUTHTOKEN;
+require('dotenv').config();
+const client = require('twilio')(process.env.ACCOUNTSID, process.env.AUTHTOKEN);
 const sms=(phoneNumber, otp)=>{
   phoneNumber="+91"+phoneNumber;
     const messageBody = `Your OTP for verification is ${otp}. Please use this code to complete your process.`;

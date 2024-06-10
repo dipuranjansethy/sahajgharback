@@ -116,7 +116,7 @@ socket.on('private-chat', async (payload) => {
     console.log('User disconnected');
   });
 });
-
+require('dotenv').config();
 
 app.use('/merchant', MerchantRouter);
 app.use('/admin', AdminRouter);
