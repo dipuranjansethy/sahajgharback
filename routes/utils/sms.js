@@ -1,5 +1,5 @@
-const accountSid = 'AC19f1135e740fd32befa83ec12fe3fd4a';
-const authToken = '1d0fa5775f322381d92fe876b42296fb';
+const accountSid = process.env.accountSid;
+const authToken = 'process.env.authToken ';
 const client = require('twilio')(accountSid, authToken);
 const sms=(phoneNumber, otp)=>{
   phoneNumber="+91"+phoneNumber;
