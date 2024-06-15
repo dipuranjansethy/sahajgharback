@@ -63,6 +63,7 @@ router.get('/notifications/:merchantId', async (req, res) => {
   try {
     const { merchantId } = req.params;
     const notifications = await NotificationMerchant.find({ merchantId });
+    // const costumer=await User.find({notifications.userId});
     res.json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);

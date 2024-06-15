@@ -4,20 +4,24 @@ const sms = require('../utils/sms');
 const router = express.Router();
 const sendToken=require('../utils/sendToken')
 const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
+require('dotenv').config();
+
 
 // Create a new user
 router.post('/createUser', async (req, res) => {
   try {
-    const { userName , mobile,sentOtp,otp } = req.body;
+    // const { userName , mobile,sentOtp,otp } = req.body;
+    const { userName , mobile } = req.body;
 
     // Check if the mobile number already exists
     const existingUser = await User.findOne({ Mobile: mobile });
     if (existingUser) {
       return res.json({ message: 'Already registered, Try to login' ,success : false});
     }
-    if(sentOtp!=otp){
-      return res.json({ message: 'otp is incorrect' ,success : false});
-    }
+    // if(sentOtp!=otp){
+    //   return res.json({ message: 'otp is incorrect' ,success : false});
+    // }
     // Create a new user
     const newUser = new User({
       userName: userName,
@@ -91,30 +95,47 @@ router.post('/sendotp',async(req,res)=>{
   }
 })
 
-router.post('/verifyOtp', async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
   try {
     // const otpVerified=false;
-    const { strOtp , mobile  } = req.body;
-    const user = await User.findOne({ Mobile: mobile }).select("+otp");
+    // const { strOtp , mobile  } = req.body;
+    const { mobile  } = req.body;
+    const user = await User.findOne({ Mobile: mobile });
 
-    if (!user) {
-      return res.status(404).json({ otpVerified: false, message: "User not found" });
-    }
+    // if (!user) {
+    //   return res.status(404).json({ otpVerified: false, message: "User not found" });
+    // }
 
-    const isMatch = await user.compareOtp(strOtp);
-    if (!isMatch) {
-      return res.status(400).json({ otpVerified: false, message: "Invalid OTP" });
-    }
-    const otpVerified=true;
-    user.otpExpire = null; // or set it to any other value that signifies expiry
-    user.otp = null; // or set it to any other value that signifies expiry
-    await user.save(); // Save the updated user object
+    // const isMatch = await user.compareOtp(strOtp);
+    // if (!isMatch) {
+    //   return res.status(400).json({ otpVerified: false, message: "Invalid OTP" });
+    // }
+    // const otpVerified=true;
+    // user.otpExpire = null; // or set it to any other value that signifies expiry
+    // user.otp = null; // or set it to any other value that signifies expiry
+    // await user.save(); // Save the updated user object
     sendToken(res, user, "login successfull", 200);
   } catch (error) {
     next(error);
   }
 });
 
+router.post('/feedback', async (req, res) => {
+  const { name, email, message } = req.body;
+
+  if (!name || !email || !message)
+    return res.status(400).send('Missing required fields: to, subject, text');
+  const to = process.env.MY_MAIL;
+  const subject = "feedback from sahajGhar";
+  const text = `I am ${name} and my Email is ${email}. \n${message}`;
+
+  await sendEmail(to, subject, text);
+
+  res.status(200).json({
+    success: true,
+    message: "Your Message Has Been Sent.",
+  });
+});
 
 // Check if mobile number exists
 router.post('/checkMobile', async (req, res) => {
